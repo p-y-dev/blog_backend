@@ -1,0 +1,5 @@
+/var/
+__pycache__
+/src/blog_backend/settings/local.py
+/src/blog_backend/settings/prod.py
+.*/
