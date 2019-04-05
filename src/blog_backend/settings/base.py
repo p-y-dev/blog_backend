@@ -31,6 +31,9 @@ INSTALLED_APPS = [
 
     'blog_backend',
     'blog_backend.doc_swagger',
+
+    'blog_backend.account',
+    'blog_backend.auth',
 ]
 
 MIDDLEWARE = [
