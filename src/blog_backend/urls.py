@@ -15,7 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from blog_backend.doc_swagger.views import swagger_schema_view
 
 urlpatterns = [
+    path('doc/', swagger_schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('admin/', admin.site.urls),
 ]
