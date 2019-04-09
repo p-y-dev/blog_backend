@@ -13,8 +13,11 @@ class ConfirmationEmail(models.Model):
                                     max_length=1024)
     created_at = models.DateTimeField(verbose_name=_('Дата создания кода подтверждения'), default=timezone.now)
     email = models.EmailField(verbose_name=_('Email адрес'), unique=True)
-    confirm = models.BooleanField(verbose_name=_('Подтвержден?'))
+    confirm = models.BooleanField(verbose_name=_('Подтвержден?'), default=False)
 
     class Meta:
         verbose_name = _('Подтверждение емейла')
         verbose_name_plural = _('Подтверждение емейлов')
+
+    def __str__(self):
+        return self.email
