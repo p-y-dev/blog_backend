@@ -20,3 +20,13 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+# SMTP
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'user@yandex.ru'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_USE_SSL = True
+
+# Urls client
+URL_CLIENT_CONFIRM_EMAIL = 'http://localhost:8000/confirm_email/'
