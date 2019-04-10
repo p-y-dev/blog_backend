@@ -38,14 +38,11 @@ def send_confirm_email(request):
 
         type_confirm = serializer.validated_data.pop('type')
         email = serializer.validated_data['email']
-        ConfirmationEmail.objects.update_or_create(
-            email=email, defaults=serializer.validated_data
-        )
 
-        confirm_code = serializer.validated_data['confirm_code']
+        ConfirmationEmail.objects.update_or_create(email=email, defaults=serializer.validated_data)
 
         get_params = {
-            'confirm_code': confirm_code,
+            'confirm_code': serializer.validated_data['confirm_code'],
             'type': type_confirm
         }
 
