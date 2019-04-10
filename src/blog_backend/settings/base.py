@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'blog_backend.account',
     'blog_backend.auth',
+    'blog_backend.notifications.email',
 ]
 
 MIDDLEWARE = [

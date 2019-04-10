@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from django.core.mail import send_mail
 from django.conf import settings
 from blog_backend.errors import exceptions
+from blog_backend.notifications.email.send import send_email_confirm
 
 from . import serializers
 from .models import ConfirmationEmail
@@ -41,17 +41,9 @@ def send_confirm_email(request):
 
         ConfirmationEmail.objects.update_or_create(email=email, defaults=serializer.validated_data)
 
-        get_params = {
-            'confirm_code': serializer.validated_data['confirm_code'],
-            'type': type_confirm
-        }
+        get_params = {'confirm_code': serializer.validated_data['confirm_code'], 'type': type_confirm}
 
         url_email_confirm = forming_url_with_params(client_url, get_params)
-
-        # TODO: реализовать отдельное приложение для отправки
-        subject = 'Подтверждение email'
-        from_email = settings.EMAIL_HOST_USER
-        recipient_list = [email]
-        send_mail(subject, url_email_confirm, from_email, recipient_list)
+        send_email_confirm(email, url_email_confirm)
 
     return Response(status=status.HTTP_200_OK)
