@@ -24,4 +24,4 @@ def send_email_confirm(to: str, url_email_confirm: str):
 
     msg = EmailMultiAlternatives(subject, body_message, from_email, recipient_list)
     msg.attach_alternative(body_message, 'text/html')
-    msg.send()
+    return msg.send()

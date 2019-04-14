@@ -6,11 +6,11 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from django.conf import settings
 from blog_backend.errors import exceptions
-from blog_backend.notifications.email.send import send_email_confirm
 
 from . import serializers
 from .models import ConfirmationEmail
 from blog_backend.utils import forming_url_with_params
+from .tasks import user_send_activation_email
 
 
 @swagger_auto_schema(
@@ -42,8 +42,8 @@ def send_confirm_email(request):
         ConfirmationEmail.objects.update_or_create(email=email, defaults=serializer.validated_data)
 
         get_params = {'confirm_code': serializer.validated_data['confirm_code'], 'type': type_confirm}
-
         url_email_confirm = forming_url_with_params(client_url, get_params)
-        send_email_confirm(email, url_email_confirm)
+
+        user_send_activation_email.delay(email, url_email_confirm)
 
     return Response(status=status.HTTP_200_OK)
