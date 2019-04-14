@@ -47,3 +47,27 @@ def send_confirm_email(request):
         user_send_activation_email.delay(email, url_email_confirm)
 
     return Response(status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_summary='Подтверждение почты.',
+    operation_description='Подтверждает почту пользователя, для дальнейшей работы в системе.',
+    request_body=serializers.ReqConfirmEmailSerializer,
+    responses={
+        status.HTTP_200_OK: serializers.ConfirmEmailSerializer
+    }
+)
+@api_view(['POST'])
+def confirm_email(request):
+    serializer = serializers.ReqConfirmEmailSerializer(data=request.data)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+
+    with transaction.atomic():
+        serializer.validated_data['confirmation_email'].confirm = True
+        serializer.validated_data['confirmation_email'].save()
+
+    confirmation_email = serializers.ConfirmEmailSerializer(serializer.validated_data['confirmation_email']).data
+
+    return Response(confirmation_email, status=status.HTTP_200_OK)

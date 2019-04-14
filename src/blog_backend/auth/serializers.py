@@ -1,5 +1,3 @@
-import os
-import uuid
 from enum import Enum
 
 from django.utils import timezone
@@ -7,17 +5,8 @@ from rest_framework import serializers
 
 from blog_backend.account.models import Account
 from blog_backend.errors import validation
-
-
-def generate_token(val) -> str:
-    """
-    Создание уникального токена
-
-    :param val: Значение, которое будет участвовать в случайной генерации
-    :return: Возвращает случайный токен
-    """
-
-    return str(uuid.UUID(bytes=os.urandom(16), version=4)) + str(val)
+from blog_backend.utils import life_time_is_correct, generate_token
+from .models import ConfirmationEmail
 
 
 class ReqSendConfirmEmailSerializer(serializers.Serializer):
@@ -47,3 +36,33 @@ class ReqSendConfirmEmailSerializer(serializers.Serializer):
         validated_data['created_at'] = timezone.now()
 
         return validated_data
+
+
+class ReqConfirmEmailSerializer(serializers.Serializer):
+    confirm_code = serializers.CharField(min_length=1, max_length=1024)
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        confirm_code = validated_data.pop('confirm_code')
+
+        confirmation_email_obj = ConfirmationEmail.objects.filter(confirm_code=confirm_code)
+
+        if not confirmation_email_obj.exists():
+            raise serializers.ValidationError({'confirm_code': validation.CODE_NOT_FOUND})
+        confirmation_email_obj = confirmation_email_obj.get()
+
+        if not life_time_is_correct(confirmation_email_obj.LIFE_TIME_SECONDS, confirmation_email_obj.created_at):
+            raise serializers.ValidationError({'confirm_code': validation.CODE_EXPIRED})
+
+        if confirmation_email_obj.confirm:
+            raise serializers.ValidationError({'confirm_code': validation.EMAIL_CODE_ALREADY_CONFIRMED})
+
+        validated_data['confirmation_email'] = confirmation_email_obj
+
+        return validated_data
+
+
+class ConfirmEmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ConfirmationEmail
+        fields = 'confirm', 'email'
