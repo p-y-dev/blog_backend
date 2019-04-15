@@ -1,10 +1,10 @@
 faker~=1.0.2
-pytz~=2018.9
+pytz~=2019.1
 Django~=2.2
-ipython~=6.2.1
-psycopg2~=2.7.4
-psycopg2-binary~=2.7.4
-djangorestframework~=3.8.2
-drf-yasg~=1.12.1
+ipython~=7.4.0
+psycopg2-binary~=2.8.2
+psycopg2~=2.8.2
+djangorestframework~=3.9.2
+drf-yasg~=1.15.0
 factory-boy~=2.11.1
-celery[redis]~=4.2.1
+celery[redis]~=4.3.0

@@ -71,5 +71,5 @@ Celery используется для отправки e-mail и для про�
 В директории blog_backend/src запускаем celery следующим образом:
 
 ```
-path_to_project/var/venv/bin/celery -A myagent_backend worker --beat -s path_to_project/var/beat/celerybeat-schedule --logfile=path_to_project/var/beat/beat.log --pidfile=path_to_project/var/beat/beat.pid -l info
+path_to_project/var/venv/bin/celery -A blog_backend worker --beat -s path_to_project/var/beat/celerybeat-schedule --logfile=path_to_project/var/beat/beat.log --pidfile=path_to_project/var/beat/beat.pid -l info
 ```

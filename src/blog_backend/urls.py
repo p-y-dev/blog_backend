@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('auth/', include('blog_backend.auth.urls')),
+    path('account/', include('blog_backend.account.urls')),
 ]

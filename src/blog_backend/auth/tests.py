@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import reverse
 from faker import Factory
 from rest_framework import status
@@ -14,7 +16,8 @@ class TestsAuth(APITestCase):
     def setUp(self):
         self.url_send_confirm_email = reverse('auth:send_confirm_email')
 
-    def test_send_confirm_email(self):
+    @patch('blog_backend.auth.views.user_send_activation_email')
+    def test_send_confirm_email(self, mock_user_send_activation_email):
         """
         Отправка ссылки для подтверждения e-mail
         """

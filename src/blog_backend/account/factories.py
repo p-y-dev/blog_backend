@@ -15,4 +15,6 @@ class AccountFactory(factory.DjangoModelFactory):
     first_name = faker.first_name()
     last_name = faker.last_name()
     middle_name = faker.name()
+    sex = Account.Sex.male.name
     password = make_password(faker.password())
+    date_birth = '1990-01-01'

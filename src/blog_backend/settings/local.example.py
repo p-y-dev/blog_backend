@@ -21,6 +21,10 @@ DATABASES = {
     }
 }
 
+# Celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
 # SMTP
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
