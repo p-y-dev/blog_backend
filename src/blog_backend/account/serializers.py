@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from blog_backend.auth.models import ConfirmationEmail
 from blog_backend.errors import validation
-from blog_backend.utils import life_time_is_correct
+from blog_backend.utils import life_time_is_correct, jwt_encode
 from .models import Account
 
 regex_password = r'(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}'
@@ -55,7 +55,13 @@ class ReqRegistrationAccountSerializer(serializers.ModelSerializer):
         return validate_password(validate_data)
 
 
-class AccountSerializer(serializers.ModelSerializer):
+class LoginAccountSerializer(serializers.ModelSerializer):
+    access_token = serializers.SerializerMethodField(label='Токен доступа')
+
     class Meta:
         model = Account
-        exclude = 'password',
+        fields = 'id', 'email', 'sex', 'first_name', 'last_name', 'middle_name', 'date_birth', 'access_token'
+
+    @staticmethod
+    def get_access_token(obj):
+        return jwt_encode(obj.email)

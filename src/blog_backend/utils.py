@@ -3,6 +3,8 @@ import urllib.parse as urlparse
 import uuid
 from datetime import timedelta
 
+import jwt
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -47,3 +49,25 @@ def generate_token(val) -> str:
     """
 
     return str(uuid.UUID(bytes=os.urandom(16), version=4)) + str(val)
+
+
+def jwt_encode(email: str) -> str:
+    """
+    Формирует JWT токен по email
+
+    :param email: email для генерации JWT токена
+    :return: JWT токен
+    """
+
+    return jwt.encode({'email': email}, settings.JWT_SECRET_KEY, algorithm='HS256').decode('utf-8')
+
+
+def jwt_decode(jwt_token: str) -> str:
+    """
+    Получение email по JWT токену
+
+    :param jwt_token: JWT токен
+    :return: Email
+    """
+
+    return jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms='HS256')['email']

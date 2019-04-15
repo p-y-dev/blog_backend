@@ -17,7 +17,7 @@ from .models import Account
     operation_description='Регистрация в системе.',
     request_body=serializers.ReqRegistrationAccountSerializer,
     responses={
-        status.HTTP_201_CREATED: serializers.AccountSerializer
+        status.HTTP_201_CREATED: serializers.LoginAccountSerializer
     }
 )
 @api_view(['POST'])
@@ -29,6 +29,6 @@ def registration(request):
     with transaction.atomic():
         account_obj = Account.objects.create(**serializer.validated_data)
         ConfirmationEmail.objects.filter(email=account_obj.email).delete()
-        account_obj = serializers.AccountSerializer(account_obj).data
+        account_obj = serializers.LoginAccountSerializer(account_obj).data
 
     return Response(account_obj, status=status.HTTP_201_CREATED)

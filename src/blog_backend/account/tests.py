@@ -7,6 +7,8 @@ from blog_backend.auth.factories import ConfirmationEmailFactory
 from blog_backend.errors import validation
 from .factories import AccountFactory
 from .models import Account
+from blog_backend.utils import jwt_encode, jwt_decode
+
 
 faker = Factory.create()
 
@@ -41,6 +43,14 @@ class TestsRegistration(APITestCase):
 
         if not Account.objects.filter(email=email).exists():
             self.fail('Аккаунт не создался в системе!')
+
+        jwt_token = jwt_encode(email)
+
+        if response.json()['access_token'] != jwt_token:
+            self.fail('Сгенерирован неверный jwt токен')
+
+        if response.json()['email'] != jwt_decode(jwt_token):
+            self.fail('Расшифрован неверный email по jwt токену')
 
     def test_registration_email_already_exists(self):
         """

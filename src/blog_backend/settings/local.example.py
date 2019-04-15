@@ -34,3 +34,6 @@ EMAIL_USE_SSL = True
 
 # Urls client
 URL_CLIENT_CONFIRM_EMAIL = 'http://localhost:8000/confirm_email/'
+
+# JWT
+JWT_SECRET_KEY = 'JWT_SECRET_KEY'
