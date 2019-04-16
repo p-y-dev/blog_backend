@@ -13,8 +13,8 @@ from .models import Account
 
 @swagger_auto_schema(
     method='post',
-    operation_summary='Регистрация в системе.',
-    operation_description='Регистрация в системе.',
+    operation_summary='Регистрация пользователя в системе.',
+    operation_description='Регистрация пользователя в системе.',
     request_body=serializers.ReqRegistrationAccountSerializer,
     responses={
         status.HTTP_201_CREATED: serializers.LoginAccountSerializer
@@ -32,3 +32,22 @@ def registration(request):
         account_obj = serializers.LoginAccountSerializer(account_obj).data
 
     return Response(account_obj, status=status.HTTP_201_CREATED)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_summary='Вход пользователя в систему',
+    operation_description='Вход пользователя в систему.',
+    request_body=serializers.ReqLoginSerializer,
+    responses={
+        status.HTTP_200_OK: serializers.LoginAccountSerializer
+    }
+)
+@api_view(['POST'])
+def login(request):
+    serializer = serializers.ReqLoginSerializer(data=request.data)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+
+    account_obj = serializer.validated_data
+    return Response(serializers.LoginAccountSerializer(account_obj).data, status=status.HTTP_200_OK)

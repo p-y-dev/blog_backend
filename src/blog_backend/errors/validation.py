@@ -9,3 +9,6 @@ CODE_NOT_FOUND = _('Код не найден в системе')
 CODE_EXPIRED = _('Код устарел')
 
 PASSWORDS_DO_NOT_MATCH = _('Пароли не совпадают')
+
+USER_NOT_FOUND = _('Пользователь не найден')
+USER_INVALID_PASSWORD = _('Неверный пароль пользователя')

@@ -1,4 +1,4 @@
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from rest_framework import serializers
 
 from blog_backend.auth.models import ConfirmationEmail
@@ -65,3 +65,28 @@ class LoginAccountSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_access_token(obj):
         return jwt_encode(obj.email)
+
+
+class ReqLoginSerializer(serializers.Serializer):
+    login = serializers.EmailField(max_length=254)
+    password = serializers.CharField(min_length=6)
+
+    def validate(self, data):
+        validate_data = super().validate(data)
+        login = validate_data.pop('login')
+        password = validate_data.pop('password')
+
+        account = Account.objects.filter(email=login)
+        if not account.exists():
+            raise serializers.ValidationError({
+                'login': [validation.USER_NOT_FOUND],
+            })
+
+        account = account.get()
+
+        if not check_password(password, account.password):
+            raise serializers.ValidationError({
+                'password': [validation.USER_INVALID_PASSWORD],
+            })
+
+        return account

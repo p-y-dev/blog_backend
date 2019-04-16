@@ -1,5 +1,6 @@
 from django.urls import reverse
 from faker import Factory
+from django.contrib.auth.hashers import make_password, check_password
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -119,3 +120,56 @@ class TestsRegistration(APITestCase):
 
         if response_data['confirm_password'][0] != validation.PASSWORDS_DO_NOT_MATCH:
             self.fail('Должен сработать валидатор, пароли не совпадают!')
+
+
+class TestsLogin(APITestCase):
+    def setUp(self):
+        self.user_password = 'LKjddkjk234lkdawlkj'
+        self.account = AccountFactory(password=make_password(self.user_password))
+
+        self.url = reverse('account:login')
+        self.request_data = {
+            'login': self.account.email,
+            'password': self.user_password
+        }
+
+    def test_login(self):
+        """
+        Авторизации пользователя в системе
+        """
+
+        response = self.client.post(self.url, self.request_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Ошибка при авторизации пользователя!')
+
+        jwt_token = jwt_encode(self.account.email)
+
+        if response.json()['access_token'] != jwt_token:
+            self.fail('Сгенерирован неверный jwt токен')
+
+    def test_login_user_not_found(self):
+        """
+        Проверка валидатора при входе в систему, на то,
+        что он отработает, если в системе нет аккаунта с данным логином, или введен неверный пароль
+        """
+
+        request_data = self.request_data.copy()
+
+        # Авторизация с неверным логином
+        request_data['login'] = 'awaljdlawj@madawd.ru'
+
+        response = self.client.post(self.url, request_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response_data = response.json()
+
+        if response_data['login'][0] != validation.USER_NOT_FOUND:
+            self.fail('Должен сработать валидатор, в системе отсутвует пользователь с данным логином!')
+
+        # Авторизация с неверным паролем
+        request_data['login'] = self.account.email
+        request_data['password'] = 'ladjlwj876IKUYi22'
+        response = self.client.post(self.url, request_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response_data = response.json()
+
+        if response_data['password'][0] != validation.USER_INVALID_PASSWORD:
+            self.fail('Должен сработать валидатор, в системе отсутвует пользователь с данным паролем!')
