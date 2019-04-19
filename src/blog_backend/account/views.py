@@ -51,3 +51,25 @@ def login(request):
 
     account_obj = serializer.validated_data
     return Response(serializers.LoginAccountSerializer(account_obj).data, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    method='post',
+    operation_summary='Сброс пароля у неавторизованного пользователя',
+    operation_description='Сброс пароля у неавторизованного пользователя',
+    request_body=serializers.ReqResetPasswordSerializer,
+    responses={
+        status.HTTP_200_OK: ''
+    }
+)
+@api_view(['POST'])
+def reset_password(request):
+    serializer = serializers.ReqResetPasswordSerializer(data=request.data)
+    if not serializer.is_valid():
+        raise ValidationError(serializer.errors)
+
+    with transaction.atomic():
+        serializer.validated_data['account_query'].update(password=serializer.validated_data['password'])
+        serializer.validated_data['confirm_email_query'].delete()
+
+    return Response(status=status.HTTP_200_OK)

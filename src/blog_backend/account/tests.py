@@ -173,3 +173,26 @@ class TestsLogin(APITestCase):
 
         if response_data['password'][0] != validation.USER_INVALID_PASSWORD:
             self.fail('Должен сработать валидатор, в системе отсутвует пользователь с данным паролем!')
+
+
+class TestAccount(APITestCase):
+    def test_reset_password(self):
+        old_password = 'DGmahsgfd12gfhg'
+        account = AccountFactory(password=make_password(old_password))
+        confirm_email = ConfirmationEmailFactory(email=account.email)
+
+        new_password = 'QweasdAsd434gGYtfdaw'
+        request_data = {
+            'confirm_code': confirm_email.confirm_code,
+            'password': new_password,
+            'confirm_password': new_password
+        }
+        url = reverse('account:reset_password')
+
+        response = self.client.post(url, request_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Ошибка при обновление пароля')
+
+        account = Account.objects.get(id=account.id)
+
+        if check_password(old_password, account.password) or not check_password(new_password, account.password):
+            self.fail('Пароль не обновился!')

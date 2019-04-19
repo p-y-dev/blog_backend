@@ -90,3 +90,28 @@ class ReqLoginSerializer(serializers.Serializer):
             })
 
         return account
+
+
+class ReqResetPasswordSerializer(serializers.Serializer):
+    confirm_code = serializers.CharField(label='Код подтверждения, отправленный на почту', max_length=1024)
+    password = serializers.RegexField(label='Пароль', regex=regex_password)
+    confirm_password = serializers.RegexField(label='Подтверждения пароля', regex=regex_password)
+
+    def validate(self, data):
+        validate_data = validate_password(super().validate(data))
+
+        confirm_email_query = ConfirmationEmail.objects.filter(
+            confirm_code=validate_data.pop('confirm_code'),
+            confirm=True
+        )
+        if not confirm_email_query.exists():
+            raise serializers.ValidationError({'confirm_code': [validation.EMAIL_CONFIRM_DATA_NOT_FOUND]})
+
+        confirm_email_data = confirm_email_query.values('email').get()
+        account_query = Account.objects.filter(email=confirm_email_data['email'])
+        if not account_query.exists():
+            raise serializers.ValidationError({'detail': [validation.USER_NOT_FOUND]})
+
+        validate_data['account_query'] = account_query
+        validate_data['confirm_email_query'] = confirm_email_query
+        return validate_data
