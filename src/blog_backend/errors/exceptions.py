@@ -9,3 +9,5 @@ class Conflict(APIException):
 
 URL_CLIENT_CONFIRM_EMAIL_NOT_SET = _('Не задан урл для подтверждения email пользователя. '
                                      'Обратитесь к разработчикам API.')
+ACCESS_TOKEN_IS_ABSENT = _('Токен доступа отсутствует в запросе')
+ACCESS_TOKEN_NOT_FOUND = _('Токен доступа не найден')

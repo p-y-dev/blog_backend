@@ -176,6 +176,19 @@ class TestsLogin(APITestCase):
 
 
 class TestAccount(APITestCase):
+    def test_get_account(self):
+        account = AccountFactory()
+
+        url = reverse('account:account')
+        headers = {'HTTP_AUTH': jwt_encode(account.email)}
+
+        response = self.client.get(url, **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, 'Ошибка при получении данных аккаунта')
+
+        response_data = response.json()
+        if response_data['email'] != account.email:
+            self.fail('Пришли данные другого аккаунта!')
+
     def test_reset_password(self):
         old_password = 'DGmahsgfd12gfhg'
         account = AccountFactory(password=make_password(old_password))

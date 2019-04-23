@@ -55,7 +55,7 @@ class ReqRegistrationAccountSerializer(serializers.ModelSerializer):
         return validate_password(validate_data)
 
 
-class LoginAccountSerializer(serializers.ModelSerializer):
+class AccountSerializer(serializers.ModelSerializer):
     access_token = serializers.SerializerMethodField(label='Токен доступа')
 
     class Meta:
@@ -69,7 +69,7 @@ class LoginAccountSerializer(serializers.ModelSerializer):
 
 class ReqLoginSerializer(serializers.Serializer):
     login = serializers.EmailField(max_length=254)
-    password = serializers.CharField(min_length=6)
+    password = serializers.CharField(min_length=1)
 
     def validate(self, data):
         validate_data = super().validate(data)

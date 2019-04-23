@@ -1,14 +1,28 @@
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from blog_backend.auth.models import ConfirmationEmail
 
-
+from blog_backend.auth.jwt_auth import AuthJWT
 from . import serializers
 from .models import Account
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_summary='Получение данных пользователя',
+    operation_description='Получение данных пользователя',
+    responses={
+        status.HTTP_200_OK: serializers.AccountSerializer
+    }
+)
+@api_view(['GET'])
+@authentication_classes((AuthJWT,))
+def account(request):
+    return Response(serializers.AccountSerializer(request.user).data, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -17,7 +31,7 @@ from .models import Account
     operation_description='Регистрация пользователя в системе.',
     request_body=serializers.ReqRegistrationAccountSerializer,
     responses={
-        status.HTTP_201_CREATED: serializers.LoginAccountSerializer
+        status.HTTP_201_CREATED: serializers.AccountSerializer
     }
 )
 @api_view(['POST'])
@@ -29,7 +43,7 @@ def registration(request):
     with transaction.atomic():
         account_obj = Account.objects.create(**serializer.validated_data)
         ConfirmationEmail.objects.filter(email=account_obj.email).delete()
-        account_obj = serializers.LoginAccountSerializer(account_obj).data
+        account_obj = serializers.AccountSerializer(account_obj).data
 
     return Response(account_obj, status=status.HTTP_201_CREATED)
 
@@ -40,7 +54,7 @@ def registration(request):
     operation_description='Вход пользователя в систему.',
     request_body=serializers.ReqLoginSerializer,
     responses={
-        status.HTTP_200_OK: serializers.LoginAccountSerializer
+        status.HTTP_200_OK: serializers.AccountSerializer
     }
 )
 @api_view(['POST'])
@@ -50,7 +64,7 @@ def login(request):
         raise ValidationError(serializer.errors)
 
     account_obj = serializer.validated_data
-    return Response(serializers.LoginAccountSerializer(account_obj).data, status=status.HTTP_200_OK)
+    return Response(serializers.AccountSerializer(account_obj).data, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
