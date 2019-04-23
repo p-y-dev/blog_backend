@@ -1,0 +1,15 @@
+<div class="info-block" style="margin-top: 60px;">
+  <h2>Аутентифицированные запросы</h2>
+  <div class="body-info-block" style="padding-left: 20px; padding-right: 20px;">
+    <p>Некоторые методы API закрыты, запрос к ним должен содержать заголовок <b>AUTH</b>,
+      в котором передается JWT, полученный при регистрации, или авторизации в системе.</p>
+    <h4>Запросы, которые не требуют аутентификацию:</h4>
+    <ul>
+      <li><b>/account/login</b> - Вход пользователя в систему;</li>
+      <li><b>/account/registration</b> - Регистрация пользователя в системе;</li>
+      <li><b>/account/reset_password</b> - Сброс пароля у неавторизованного пользователя;</li>
+      <li><b>/auth/confirm_email</b> - Подтверждение почты;</li>
+      <li><b>/auth/send_confirm_email</b> - Отправка ссылки для подтверждения почты;</li>
+    </ul>
+  </div>
+</div>
